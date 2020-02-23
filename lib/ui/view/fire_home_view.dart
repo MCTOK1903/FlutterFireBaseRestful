@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_restfull/core/model/user.dart';
 import 'package:flutter_firebase_restfull/core/service/firebase_service.dart';
 
 class FireHomeView extends StatefulWidget {
@@ -19,11 +20,13 @@ class _FireHomeViewState extends State<FireHomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder(builder: (context, snapshot) {
+      body: FutureBuilder(
+        future: firebaseSerive.getUsers(),
+        builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             if (snapshot.hasData) {
-              return _listUser();
+              return _listUser(snapshot.data);
             } else {
               return _notFoundWidget;
             }
@@ -35,8 +38,18 @@ class _FireHomeViewState extends State<FireHomeView> {
     );
   }
 
-  Widget _listUser() {  
-    return Center(child: Text("data"));
+  Widget _listUser(List<User> list) {
+    return Center(child: ListView.builder(itemCount: list.length,itemBuilder:(context,index){
+      return _userCard(list[index]);
+    } ));
+  }
+
+  Widget _userCard(User user){
+    return Card(
+      child: ListTile(
+        title: Text(user.name),
+      ),
+    );
   }
 
   Widget get _notFoundWidget => Center(child: Text("Not Found"));
